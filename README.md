@@ -153,7 +153,7 @@ The curve above shows the model's accuracy across the epochs. As seen, the accur
 
 The confusion matrix gives a detailed view of the model's performance across all categories. It helps understand how the model is performing and which categories it tends to confuse.
 
-![Confusion Matrix](images/confusion_matrix.png)
+![Confusion Matrix](exp/confusion_matrix.png)
 
 In the matrix above:
 - **Rows** represent the true labels (actual waste types).
