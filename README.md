@@ -15,8 +15,8 @@ This project, **Smart Waste Sorter**, uses computer vision to identify and sort 
     - [Model Architecture](#model-architecture)
     - [Training Process](#training-process)
     - [Model Evaluation](#model-evaluation)
-    - [Accuracy Curve](#accuracy-curve)
-    - [Confusion Matrix](#confusion-matrix)
+       - [Precision-Recall (PR) Curve](#precision-recall-pr-curve)
+       - [Confusion Matrix](#confusion-matrix)
 7. [Contributing](#contributing)
 8. [License](#license)
 
@@ -139,14 +139,11 @@ The evaluation results show that the model performs well in detecting and classi
 
 ---
 
-#### **Accuracy Curve**
+#### Precision-Recall (PR) Curve**  
+   The Precision-Recall curve shows the trade-off between Precision and Recall for different threshold values, and is particularly useful for imbalanced datasets. As seen, the model performs well in detecting relevant waste categories.
 
-The accuracy curve shows how the model's accuracy improved over each epoch during training. It indicates that the model converged successfully after several epochs.
-
-![Accuracy Curve](images/accuracy_curve.png)
-
-The curve above shows the model's accuracy across the epochs. As seen, the accuracy improved as the training progressed, demonstrating the model's learning ability.
-
+   ![Precision-Recall Curve](exp/PR_curve.png)
+   
 ---
 
 #### **Confusion Matrix**
@@ -160,6 +157,8 @@ In the matrix above:
 - **Columns** represent the predicted labels (model's output).
   
 This matrix helps in identifying which waste categories the model struggles to distinguish between, and areas where improvement is needed.
+
+---
 
 ### Contributing
 
@@ -209,6 +208,7 @@ We welcome contributions to enhance and improve the **Smart Waste Sorter** proje
 
 Please follow our [Code of Conduct](link-to-code-of-conduct) when contributing.
 
+---
 
 ### License
 
