@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Waste Sorter - Waste Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+           min-height: 900px; /* Ensures the body is long enough to scroll */
+            background-color: #f4f4f4;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%235d6e54' fill-opacity='0.39'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+           scroll-behavior: smooth; /* Enables smooth scrolling */
+        }
+
+        header {
+            background-color: #004d40;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .logo {
+            height: 50px;
+            cursor: pointer;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            flex: 1;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #00796b;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        nav a:hover {
+            background-color: #004d40;
+        }
+
+        .container {
+            margin-top: 80px;
+            padding: 20px;
+            flex-direction: column; 
+        }
+
+        .section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+        }
+
+        .section.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        .about-us, .our-goals, .how-it-works, .contact-us {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .about-image, .goals-image {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+.how-it-works {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    margin-top: 20px; /* Space above the section */
+}
+
+video {
+    display: block;
+    max-width: 100%; /* Ensure video is responsive */
+    height: 400px; /* Set a smaller fixed height for the video */
+    object-fit: cover; /* Ensure the video covers the container */
+    margin-top: 20px; /* Space between the text and the video */
+    border-radius: 8px; /* Optional: Add rounded corners to the video */
+}
+
+        .services, .buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .services div, .buttons button {
+            flex: 1;
+            background-color: white;
+            padding: 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .services div:hover, .buttons button:hover {
+            transform: translateY(-5px);
+        }
+
+        .services h2 {
+            margin-top: 0;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        #detect-image .buttons {
+            display: flex;               /* Flexbox for horizontal alignment */
+            justify-content: center;     /* Center the buttons horizontally */
+            gap: 20px;                   /* Space between the buttons */
+            margin-top: 20px;            /* Space above the buttons */
+        }
+        
+        /* Styling for both buttons */
+        #detect-image .buttons button {
+            width: 150px;               /* Fixed width for consistency */
+            height: 45px;               /* Fixed height */
+            font-size: 16px;            /* Font size for readability */
+            background-color: #004d40; /* Button background color */
+            color: white;               /* Button text color */
+            border: none;               /* Remove default border */
+            border-radius: 5px;         /* Rounded corners */
+            cursor: pointer;            /* Change cursor on hover */
+            transition: background-color 0.3s ease; /* Smooth color transition */
+        }
+        
+        /* Hover effect for buttons */
+        #detect-image .buttons button:hover {
+            background-color: #00796b;  /* Darker shade on hover */
+        }
+        
+        /* Optional: Styling for the label inside the upload form */
+        .upload-file-label {
+            display: inline-block;      /* Inline display for the label */
+            font-size: 14px;            /* Font size */
+            margin-right: 10px;         /* Space between label and input */
+            color: #004d40;             /* Color of the label */
+            cursor: pointer;           /* Cursor pointer when hovered */
+        }
+        
+.button-container {
+    display: flex; /* Enable Flexbox */
+    justify-content: center; /* Center horizontally */
+    margin-top: 20px; /* Optional: Add some space above the button */
+}
+
+.button-container button {
+    background-color: #004d40; /* Dark teal background */
+    color: white; /* White text */
+    border: none; /* Remove borders */
+    padding: 15px 30px; /* Padding */
+    font-size: 16px; /* Font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease-in-out; /* Smooth background color transition */
+}
+
+.button-container button:hover {
+    background-color: #00796b; /* Lighter teal background on hover */
+}
+
+
+.contact-section {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease-in-out;
+}
+
+.contact-section h3, .contact-section p {
+    animation: fadeIn 1s ease-in-out;
+}
+
+.contact-section .hidden-email {
+    display: inline-block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: black;
+    text-decoration: none;
+    animation: fadeIn 1s ease-in-out;
+}
+    .social-media a {
+            display: inline-block;
+            align-items: center;
+            color: black;
+            text-decoration: none;
+            gap: 8px;
+           animation: fadeIn 1s ease-in-out;
+
+        }
+
+.contact-section .social-media {
+    margin-top: 20px;
+    animation: fadeIn 1s ease-in-out;
+}
+
+        .social-media img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .map iframe {
+            border: none;
+            border-radius: 5px;
+            height: 250px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+
+footer {
+    background-color: #004d40;
+    color: white;
+    padding: 20px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    height: 100px;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+footer .social-media {
+    display: flex;
+      flex-direction: row; 
+    align-items: center; /* Center items horizontally */
+    gap: 10px; /* Space between each social media item */
+}
+
+footer .social-media h3 {
+    margin: 0;
+    font-size: 18px;
+    color: white;
+}
+
+footer .social-media a {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    gap: 8px; /* Space between logo and name */
+}
+
+footer .social-media img {
+    width: 30px; /* Size of the logo */
+    height: 30px;
+}
+
+footer .contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+footer .contact h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: white;
+}
+
+footer .contact p {
+    margin: 0;
+}
+
+footer .hidden-email {
+    color: white;
+    text-decoration: none;
+}
+
+.about-goals-container {
+    display: flex; /* Use Flexbox to arrange the sections side by side */
+    justify-content: space-between; /* Space between the sections */
+    gap: 20px; /* Space between sections */
+}
+
+.about-image, .goals-image {
+    width: 100%; /* Make images responsive */
+    max-height: 300px; 
+    object-fit: cover; 
+    height: auto;
+    margin-top: 20px; /* Space between the text and the image */
+}
+
+@media screen and (max-width: 768px) {
+    .about-goals-container {
+        flex-direction: column; /* Stack sections vertically on smaller screens */
+        gap: 20px; /* Space between stacked sections */
+    }
+
+    .section {
+        width: 100%; /* Full width for each section on smaller screens */
+    }
+
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='images/SWS.png') }} " alt="Smart Waste Sorter Logo" class="logo" onclick="showSection('about-us')">
+        <h1>Smart Waste Sorter - Waste Detection</h1>
+        <nav>
+            <a href="#services" onclick="showSection('services')">Services</a>
+            <a href="#how-it-works" onclick="showSection('how-it-works')">How It Works</a>
+            <a href="#detect-image" onclick="showSection('detect-image')">Detect Image</a>
+            <a href="#contact" onclick="showSection('contact')">Contact</a>
+        </nav>
+    </header>
+    <div class="container">
+            <div class="about-goals-container">
+        <section id="about-us" class="section about-us">
+            <h2>About Us</h2>
+            <p>We are dedicated to revolutionizing waste management through advanced technology. Our mission is to simplify the waste sorting process and promote effective recycling practices. Our innovative solutions help users easily categorize and manage their waste, contributing to a cleaner and more sustainable environment.</p>
+            <img src="{{ url_for('static', filename='images/pixlr-image-generator-b64f6115-ec0f-4750-b277-d7f42d94a936.png') }}" alt="About Us Image" class="about-image">
+        </section>
+    
+        <section id="our-goals" class="section our-goals">
+            <h2>Our Goals</h2>
+            <p>Our goals are to enhance waste sorting efficiency, increase recycling rates, and raise awareness about environmental sustainability. We aim to provide users with a user-friendly interface and accurate waste detection to support a cleaner planet.</p>
+            <img src="{{ url_for('static', filename='images/pixlr-image-generator-7c3296b2-0c24-4d33-b417-f189cdfcf482.png') }} " alt="Our Goals Image" class="goals-image">
+        </section>
+    </div>
+</div>
+        </section>
+        <section id="services" class="section">
+            <h2>Our Services</h2>
+            <div class="services">
+                <div>
+                    <h2>Waste Detection</h2>
+                    <p>Automatically detects and categorizes waste materials into predefined categories such as plastic, glass, paper, metal, etc.</p>
+                </div>
+                <div>
+                    <h2>Recycling Guidance</h2>
+                    <p>Helps users understand the type of waste they are dealing with and provides suggestions for proper recycling or disposal.</p>
+                 </div>
+                <div>
+                    <h2>Educational Tool</h2>
+                    <p>Serves as an educational resource to raise awareness about proper waste management practices and the importance of recycling.</p>
+                    </div>
+            </div>
+        </section>
+        <section id="how-it-works" class="section how-it-works">
+            <h2>How It Works</h2>
+               <p>Watch the video below to learn more about how our application works:</p>
+    <video controls width="100%">
+        <source src="{{ url_for('static', filename='videos/invideo-ai-1080 How to Use the Smart Waste Sorter App 2024-08-27.mp4') }} " type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+            <p><b>1. Upload or Capture: Users upload an image or capture a photo of waste using the web application.</b></p>
+            <p><b>2. Detection: The uploaded or captured image is processed by the YOLOv5 model to identify and classify the waste materials.</b></p>
+            <p><b>3. Results Display: The application renders the image with detection results and provides options to view or download the processed image.</b></p>
+        </section>
+        <section id="detect-image" class="section">
+            <h2>Detect Image</h2>
+            <div class="buttons">
+                <button class="upload" onclick="document.querySelector('#upload-form').style.display='block'; document.querySelector('#file-input').click();">Upload Image</button>
+            
+                <!-- Capture Video Button -->
+                <form action="{{ url_for('capture') }}" method="get">
+                    <button type="submit" class="capture">Capture Video</button>
+                </form>
+            </div>
+            
+            <!-- Upload Form -->
+            <form id="upload-form" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" style="display:none;">
+                <label for="file-input" class="upload-file-label">Choose File</label>
+                <input type="file" id="file-input" name="file" accept="image/*,video/*" style="display:none;">
+                <div class="button-container">
+                    <button type="submit" class="upload">Detect</button>
+                </div>
+            </form>
+            
+            <!-- Video Section -->
+            <div id="video-container" style="display:none;">
+                <h3>Video Feed</h3>
+                <img src="{{ url_for('video_feed') }}" width="100%" />
+            </div>
+        </section>
+        
+<section id="contact" class="section">
+    <div class="contact-section">
+        <h3>Contact Us</h3>
+        <p><b>Have any questions or concerns? Feel free to reach out to us:</b></p>
+        <p><a href="mailto:rosegonedie134@gmail.com" class="hidden-email">Email Us</a></p>
+        <div class="social-media">
+            <a href="https://facebook.com/yourprofile" target="_blank">
+                 <img src="{{ url_for('static', filename='images/—Pngtree—facebook social media icon_8704814.png') }}"  alt="Facebook">
+                <span>Facebook</span>
+            <a href="https://twitter.com/yourprofile" target="_blank">
+                <img src="{{ url_for('static', filename='images/—Pngtree—twitter icon_3584901.png') }}"alt="Twitter">
+                <span>Twitter</span>
+            </a>
+            <a href="https://instagram.com/yourprofile" target="_blank">
+                <img src="{{ url_for('static', filename='images/—Pngtree—instagram icon_8704817.png') }}" alt="Instagram">
+                <span>Instagram</span>
+            </a>
+        </div>
+        <div class="map">
+            <p><b>Here's our location:</b></p>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3771.9606390080908!2d72.86768527474943!3d19.02145603217193!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7cfdb3592ae71%3A0x24a513f82882be61!2sVidyalankar%20Institute%20of%20Technology!5e0!3m2!1sen!2sin!4v1692811341683!5m2!1sen!2sin" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+    </div>
+</section>
+<footer class="visible">
+    <div class="social-media">
+        <h3>Follow Us</h3>
+        <a href="https://facebook.com">
+           <img src="{{ url_for('static', filename='images/—Pngtree—facebook social media icon_8704814.png') }}" alt="Facebook">
+            Facebook
+        </a>
+        <a href="https://twitter.com">
+            <img src="{{ url_for('static', filename='images/—Pngtree—twitter icon_3584901.png') }}" alt="Twitter">
+            Twitter
+        </a>
+        <a href="https://instagram.com">
+            <img src="{{ url_for('static', filename='images/—Pngtree—instagram icon_8704817.png') }}" alt="Instagram">
+            Instagram
+        </a>
+    </div>
+    <div class="contact">
+        <h3>Contact Us</h3>
+        <p><a href="mailto:rosegonedie134@gmail.com" class="hidden-email">Email Us</a></p>
+    </div>
+</footer>
+    <script>
+ document.addEventListener('DOMContentLoaded', () => {
+    // Show "About Us" section by default
+    document.getElementById('about-us').classList.add('visible');
+    document.getElementById('our-goals').classList.add('visible');
+    
+    // Handle navigation clicks
+    document.querySelectorAll('nav a').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('visible');
+            });
+            
+            // Show the targeted section
+            document.getElementById(targetId).classList.add('visible');
+        });
+    });
+
+    // Handle logo click to go back to "About Us" and "Our Goals"
+    document.querySelector('.logo').addEventListener('click', () => {
+        // Show "About Us" and "Our Goals"
+        document.getElementById('about-us').classList.add('visible');
+        document.getElementById('our-goals').classList.add('visible');
+        
+        // Hide other sections
+        document.querySelectorAll('.section').forEach(section => {
+            if (section.id !== 'about-us' && section.id !== 'our-goals') {
+                section.classList.remove('visible');
+            }
+        });
+    });
+
+    function startVideo() {
+    document.querySelector('#video-container').style.display = 'block';  // Show video feed section
+    // Add any other JS logic to start the video feed on the frontend, if required
+}
+
+
+    // Handle footer visibility based on scroll
+    window.addEventListener('scroll', function() {
+        const footer = document.querySelector('footer');
+        const scrollPosition = window.scrollY + window.innerHeight;
+        const bodyHeight = document.body.scrollHeight;
+
+        if (scrollPosition >= bodyHeight - 100) { // Trigger visibility a bit before reaching the bottom
+            footer.classList.add('visible');
+        } else {
+            footer.classList.remove('visible');
+        }
+    });
+});
+
+</script>
+</body>
+</html>

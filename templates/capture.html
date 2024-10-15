@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Video Detection</title>
+</head>
+<body>
+    <h2>Real-Time Object Detection</h2>
+    <div>
+        <img src="{{ url_for('video_feed') }}" width="640" height="480" />
+    </div>
+
+    <!-- Button to stop capture (optional) -->
+    <button onclick="window.location.href='/'">Stop Capture</button>
+</body>
+</html>
