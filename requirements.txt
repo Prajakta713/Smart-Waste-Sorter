@@ -1,0 +1,3 @@
+Flask==2.x
+selenium==4.x
+pytest==7.x
