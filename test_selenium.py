@@ -1,9 +1,32 @@
 import os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service  # Import Service
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import pytest
+import time
+import requests
+
+# Ensure Flask is running before tests
+def wait_for_flask_app():
+    url = 'http://localhost:5000'
+    timeout = 30
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                print("Flask app is running!")
+                return
+        except requests.exceptions.RequestException:
+            pass
+        time.sleep(1)
+    raise Exception("Flask app did not start in time.")
+
+# Wait for Flask app before running tests
+wait_for_flask_app()
 
 # Setup for headless Chrome
 @pytest.fixture
@@ -11,7 +34,7 @@ def driver():
     options = Options()
     options.headless = True  # Running the browser in headless mode (without GUI)
     
-    # Update to use Service for the chromedriver path
+    # Path to chromedriver
     chromedriver_path = r"C:\Users\Prajakta\Downloads\chromedriver\chromedriver-win64\chromedriver.exe"  # Adjust the path
     service = Service(executable_path=chromedriver_path)  # Using Service
 
@@ -25,7 +48,7 @@ def test_home_page(driver):
     # Check if the title contains "Smart Waste Sorter"
     assert "Smart Waste Sorter" in driver.title
     
-    # Check if the logo is visible (by finding the logo by its class name)
+    # Check if the logo is visible
     logo = driver.find_element(By.CLASS_NAME, "logo")
     assert logo.is_displayed(), "Logo is not displayed"
     
@@ -48,22 +71,27 @@ def test_home_page(driver):
     # Click on the "Detect Image" button
     detect_image_button.click()
 
-    # Wait for the file input to be visible (assuming it's visible once clicked)
-    file_input = driver.find_element(By.ID, "image-upload")  # Update this ID to match your actual input element ID
-    assert file_input.is_displayed(), "File input is not visible"
+    # Wait for the file input to be visible
+    WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.ID, "image-upload"))
+    )
 
-    # Define relative path to the image in the repo
-    repo_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
-    image_path = os.path.join(repo_dir, "..", "static", "images", "image.png")  # Go one level up and join to the image path
+    # Define relative path to the image
+    repo_dir = os.path.dirname(os.path.abspath(__file__))
+    image_path = os.path.join(repo_dir, "..", "static", "images", "image.png")
 
+    # Check if the image file exists
+    if not os.path.exists(image_path):
+        raise FileNotFoundError(f"The image file at {image_path} does not exist.")
+    
     # Send the image path to the file input field
+    file_input = driver.find_element(By.ID, "image-upload")
     file_input.send_keys(image_path)
 
-    # Optionally, click on the "Submit" button if needed (e.g., if there's a submit button after uploading)
-    # submit_button = driver.find_element(By.ID, "submit-button")  # Adjust the ID as needed
+    # Optionally, click on the "Submit" button if needed
+    # submit_button = driver.find_element(By.ID, "submit-button")
     # submit_button.click()
 
-    # Assert that the upload was successful, based on your app's behavior after upload
-    # For example, you can check if a success message or result is displayed after the image is uploaded
+    # You can also assert upload success based on your app's behavior
     # success_message = driver.find_element(By.ID, "upload-success")
     # assert success_message.is_displayed(), "Upload was not successful"
