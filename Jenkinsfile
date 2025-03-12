@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        VENV_DIR = 'venv'  // The name of the virtual environment folder
-        CHROME_DRIVER = 'C:\\Users\\Prajakta\\Downloads\\chromedriver\\chromedriver-win64\\chromedriver.exe'  // Adjust path for ChromeDriver
-        PYTHON_PATH = '"C:\\Program Files\\Python313\\python.exe"'  // Full path to Python
+        VENV_DIR = 'venv'  // Virtual environment folder
+        CHROME_DRIVER = 'C:\\Users\\Prajakta\\Downloads\\chromedriver\\chromedriver-win64\\chromedriver.exe'
+        PYTHON_PATH = 'C:\\Program Files\\Python313\\python.exe'
     }
 
     stages {
@@ -22,23 +22,33 @@ pipeline {
             }
         }
 
-stage('Install Dependencies') {
-    steps {
-        script {
-            bat '''
-            call %VENV_DIR%\\Scripts\\activate.bat
-            pip install -r requirements.txt
-            pip install torch torchvision torchaudio
-            '''
+        stage('Create Virtual Environment') {
+            steps {
+                script {
+                    bat '''
+                    python -m venv %VENV_DIR%
+                    call %VENV_DIR%\\Scripts\\activate.bat
+                    pip install --upgrade pip
+                    '''
+                }
+            }
         }
-    }
-}
 
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    bat '''
+                    call %VENV_DIR%\\Scripts\\activate.bat
+                    pip install --no-cache-dir -r requirements.txt
+                    pip install --no-cache-dir torch torchvision torchaudio
+                    '''
+                }
+            }
+        }
 
         stage('Start Flask App') {
             steps {
                 script {
-                    // Start Flask app in the background
                     bat '''
                     call %VENV_DIR%\\Scripts\\activate.bat
                     start /B python app.py
@@ -50,7 +60,6 @@ stage('Install Dependencies') {
         stage('Wait for Flask to Start') {
             steps {
                 script {
-                    // Wait for Flask app to be responsive
                     bat '''
                     :loop
                     curl -s http://localhost:5000 > nul
@@ -80,9 +89,11 @@ stage('Install Dependencies') {
         stage('Stop Flask App') {
             steps {
                 script {
-                    // Force kill any Python processes (including Flask app)
                     bat '''
-                    taskkill /F /IM python.exe
+                    if exist flask.pid (
+                        for /F "tokens=*" %%i in (flask.pid) do taskkill /F /PID %%i
+                        del flask.pid
+                    )
                     '''
                 }
             }
