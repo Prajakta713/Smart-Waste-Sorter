@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        VENV_DIR = 'venv'  // Virtual environment folder
-        CHROME_DRIVER = 'C:\\Users\\Prajakta\\Downloads\\chromedriver\\chromedriver-win64\\chromedriver.exe'
-        PYTHON_PATH = 'C:\\Program Files\\Python313\\python.exe'
+        VENV_DIR = 'venv'  // The name of the virtual environment folder
+        CHROME_DRIVER = 'C:\\Users\\Prajakta\\Downloads\\chromedriver\\chromedriver-win64\\chromedriver.exe'  // Adjust path for ChromeDriver
+        PYTHON_PATH = '"C:\\Program Files\\Python313\\python.exe"'  // Full path to Python
     }
 
     stages {
@@ -22,13 +22,13 @@ pipeline {
             }
         }
 
-        stage('Create Virtual Environment') {
+        stage('Set Up Virtual Environment') {
             steps {
                 script {
                     bat '''
-                    python -m venv %VENV_DIR%
-                    call %VENV_DIR%\\Scripts\\activate.bat
-                    pip install --upgrade pip
+                    if not exist %VENV_DIR%\\Scripts\\activate (
+                        %PYTHON_PATH% -m venv %VENV_DIR%
+                    )
                     '''
                 }
             }
@@ -38,9 +38,7 @@ pipeline {
             steps {
                 script {
                     bat '''
-                    call %VENV_DIR%\\Scripts\\activate.bat
-                    pip install --no-cache-dir -r requirements.txt
-                    pip install --no-cache-dir torch torchvision torchaudio
+                    call %VENV_DIR%\\Scripts\\activate.bat && pip install -r requirements.txt
                     '''
                 }
             }
@@ -49,6 +47,7 @@ pipeline {
         stage('Start Flask App') {
             steps {
                 script {
+                    // Start Flask app in the background
                     bat '''
                     call %VENV_DIR%\\Scripts\\activate.bat
                     start /B python app.py
@@ -60,6 +59,7 @@ pipeline {
         stage('Wait for Flask to Start') {
             steps {
                 script {
+                    // Wait for Flask app to be responsive
                     bat '''
                     :loop
                     curl -s http://localhost:5000 > nul
@@ -89,11 +89,9 @@ pipeline {
         stage('Stop Flask App') {
             steps {
                 script {
+                    // Force kill any Python processes (including Flask app)
                     bat '''
-                    if exist flask.pid (
-                        for /F "tokens=*" %%i in (flask.pid) do taskkill /F /PID %%i
-                        del flask.pid
-                    )
+                    taskkill /F /IM python.exe
                     '''
                 }
             }
