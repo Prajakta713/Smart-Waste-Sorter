@@ -47,9 +47,10 @@ pipeline {
         stage('Start Flask App') {
             steps {
                 script {
-                    // Start Flask app using `flask run`
+                    // Ensure the virtual environment is activated and start Flask
                     bat '''
-                    start /B python -m flask run --host=0.0.0.0 --port=5000
+                    call %VENV_DIR%\\Scripts\\activate.bat
+                    start /B python app.py
                     '''
                 }
             }
