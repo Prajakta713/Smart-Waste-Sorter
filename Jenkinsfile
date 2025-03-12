@@ -44,10 +44,20 @@ pipeline {
             }
         }
 
+        stage('Verify PyTorch Installation') {
+            steps {
+                script {
+                    bat '''
+                    call %VENV_DIR%\\Scripts\\activate.bat && python -c "import torch; print(torch.__version__)"
+                    '''
+                }
+            }
+        }
+
         stage('Start Flask App') {
             steps {
                 script {
-                    // Ensure the virtual environment is activated and start Flask
+                    // Start Flask app in the background
                     bat '''
                     call %VENV_DIR%\\Scripts\\activate.bat
                     start /B python app.py
@@ -59,7 +69,7 @@ pipeline {
         stage('Wait for Flask to Start') {
             steps {
                 script {
-                    // Retry until Flask responds
+                    // Wait for Flask app to be responsive
                     bat '''
                     :loop
                     curl -s http://localhost:5000 > nul
