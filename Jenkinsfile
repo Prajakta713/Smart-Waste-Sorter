@@ -47,9 +47,9 @@ pipeline {
         stage('Start Flask App') {
             steps {
                 script {
-                    // Start the Flask app in the background (adjust the command if necessary)
+                    // Start the Flask app in the background
                     bat '''
-                    start python app.py  // Adjust this to your app's startup script
+                    start python app.py
                     '''
                 }
             }
@@ -58,8 +58,19 @@ pipeline {
         stage('Wait for Flask to Start') {
             steps {
                 script {
-                    // Wait for Flask to start by introducing a short delay
-                    bat 'timeout /t 10'  // Wait for 10 seconds before running tests
+                    // Retry until Flask responds
+                    bat '''
+                    :loop
+                    curl -s http://localhost:5000 > nul
+                    if %ERRORLEVEL%==0 (
+                        echo Flask is up and running.
+                        goto done
+                    )
+                    echo Waiting for Flask to start...
+                    timeout /t 5
+                    goto loop
+                    :done
+                    '''
                 }
             }
         }
@@ -69,6 +80,16 @@ pipeline {
                 script {
                     bat '''
                     call %VENV_DIR%\\Scripts\\activate.bat && pytest test_selenium.py --maxfail=1 --disable-warnings -q
+                    '''
+                }
+            }
+        }
+
+        stage('Stop Flask App') {
+            steps {
+                script {
+                    bat '''
+                    taskkill /IM python.exe /F
                     '''
                 }
             }
