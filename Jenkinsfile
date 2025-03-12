@@ -3,15 +3,14 @@ pipeline {
 
     environment {
         VENV_DIR = 'venv'  // The name of the virtual environment folder
-        // Use double backslashes or forward slashes
         CHROME_DRIVER = 'C:\\Users\\Prajakta\\Downloads\\chromedriver\\chromedriver-win64\\chromedriver.exe'  // Adjust path for ChromeDriver
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Checkout your Flask app repository from GitHub
-                git 'https://github.com/Prajakta713/Smart-Waste-Sorter.git'
+                // Checkout your Flask app repository using HTTPS with Personal Access Token
+                git credentialsId: 'github-token', url: 'https://github.com/Prajakta713/Smart-Waste-Sorter.git', branch: 'main'
             }
         }
 
