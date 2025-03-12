@@ -22,27 +22,18 @@ pipeline {
             }
         }
 
-        stage('Set Up Virtual Environment') {
-            steps {
-                script {
-                    bat '''
-                    if not exist %VENV_DIR%\\Scripts\\activate (
-                        %PYTHON_PATH% -m venv %VENV_DIR%
-                    )
-                    '''
-                }
-            }
+stage('Install Dependencies') {
+    steps {
+        script {
+            bat '''
+            call %VENV_DIR%\\Scripts\\activate.bat
+            pip install -r requirements.txt
+            pip install torch torchvision torchaudio
+            '''
         }
+    }
+}
 
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    bat '''
-                    call %VENV_DIR%\\Scripts\\activate.bat && pip install -r requirements.txt
-                    '''
-                }
-            }
-        }
 
         stage('Start Flask App') {
             steps {
