@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         VENV_DIR = 'venv'  // The name of the virtual environment folder
-        CHROME_DRIVER = 'C:\\path\\to\\chromedriver.exe'  // Adjust path for ChromeDriver
+        CHROME_DRIVER = 'C:\Users\Prajakta\Downloads\chromedriver\chromedriver-win64\chromedriver.exe'  // Adjust path for ChromeDriver
     }
 
     stages {
