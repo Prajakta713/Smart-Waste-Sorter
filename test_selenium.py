@@ -7,7 +7,7 @@ import pytest
 def driver():
     options = Options()
     options.headless = True  # Running the browser in headless mode (without GUI)
-    driver = webdriver.Chrome(executable_path=r"C:\path\to\chromedriver.exe", options=options)  # Adjust the path
+    driver = webdriver.Chrome(executable_path=r"C:\Users\Prajakta\Downloads\chromedriver\chromedriver-win64\chromedriver.exe", options=options)  # Adjust the path
     yield driver
     driver.quit()
 
