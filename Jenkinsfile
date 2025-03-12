@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     // Debug: Output the Python version to ensure it's available
-                    bat "${PYTHON_PATH} --version"
+                    bat "%PYTHON_PATH% --version"
                 }
             }
         }
@@ -29,8 +29,8 @@ pipeline {
                 script {
                     // Create virtual environment if not already created
                     bat '''
-                    if not exist ${VENV_DIR}\\Scripts\\activate (
-                        ${PYTHON_PATH} -m venv ${VENV_DIR}
+                    if not exist %VENV_DIR%\\Scripts\\activate (
+                        %PYTHON_PATH% -m venv %VENV_DIR%
                     )
                     '''
                 }
@@ -42,7 +42,7 @@ pipeline {
                 script {
                     // Activate the virtual environment and install dependencies
                     bat '''
-                    call ${VENV_DIR}\\Scripts\\activate.bat && pip install -r requirements.txt
+                    call %VENV_DIR%\\Scripts\\activate.bat && pip install -r requirements.txt
                     '''
                 }
             }
@@ -53,7 +53,7 @@ pipeline {
                 script {
                     // Run Selenium tests with pytest (ensure your test script name is correct)
                     bat '''
-                    call ${VENV_DIR}\\Scripts\\activate.bat && pytest test_selenium.py --maxfail=1 --disable-warnings -q
+                    call %VENV_DIR%\\Scripts\\activate.bat && pytest test_selenium.py --maxfail=1 --disable-warnings -q
                     '''
                 }
             }
