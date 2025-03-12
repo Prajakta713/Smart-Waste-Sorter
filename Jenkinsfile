@@ -47,9 +47,9 @@ pipeline {
         stage('Start Flask App') {
             steps {
                 script {
-                    // Start the Flask app in the background
+                    // Start Flask app in background
                     bat '''
-                    start python app.py
+                    start /B python app.py
                     '''
                 }
             }
@@ -88,8 +88,9 @@ pipeline {
         stage('Stop Flask App') {
             steps {
                 script {
+                    // Force kill the Python processes
                     bat '''
-                    taskkill /IM python.exe /F
+                    taskkill /F /IM python.exe
                     '''
                 }
             }
