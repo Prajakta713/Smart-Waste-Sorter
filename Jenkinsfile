@@ -56,25 +56,25 @@ pipeline {
             }
         }
 
-        stage('Wait for Flask to Start') {
-            steps {
-                script {
-                    // Wait for Flask app to be responsive
-                    bat '''
-                    :loop
-                    curl -s http://localhost:5000 > nul
-                    if %ERRORLEVEL%==0 (
-                        echo Flask is up and running.
-                        goto done
-                    )
-                    echo Waiting for Flask to start...
-                    timeout /t 5
-                    goto loop
-                    :done
-                    '''
-                }
-            }
+stage('Wait for Flask to Start') {
+    steps {
+        script {
+            bat '''
+            :loop
+            curl -s http://localhost:5000 > nul
+            if %ERRORLEVEL%==0 (
+                echo Flask is up and running.
+                goto done
+            )
+            echo Waiting for Flask to start...
+            ping -n 6 127.0.0.1 > nul
+            goto loop
+            :done
+            '''
         }
+    }
+}
+
 
         stage('Run Selenium Tests') {
             steps {
