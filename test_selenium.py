@@ -1,8 +1,8 @@
 import os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service  # Import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
 import pytest
 
 # Setup for headless Chrome
@@ -10,7 +10,12 @@ import pytest
 def driver():
     options = Options()
     options.headless = True  # Running the browser in headless mode (without GUI)
-    driver = webdriver.Chrome(executable_path=r"C:\Users\Prajakta\Downloads\chromedriver\chromedriver-win64\chromedriver.exe", options=options)  # Adjust the path
+    
+    # Update to use Service for the chromedriver path
+    chromedriver_path = r"C:\Users\Prajakta\Downloads\chromedriver\chromedriver-win64\chromedriver.exe"  # Adjust the path
+    service = Service(executable_path=chromedriver_path)  # Using Service
+
+    driver = webdriver.Chrome(service=service, options=options)  # Initialize the driver with service
     yield driver
     driver.quit()
 
