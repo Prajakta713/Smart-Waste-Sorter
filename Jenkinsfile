@@ -4,8 +4,7 @@ pipeline {
     environment {
         VENV_DIR = 'venv'  // The name of the virtual environment folder
         CHROME_DRIVER = 'C:\\Users\\Prajakta\\Downloads\\chromedriver\\chromedriver-win64\\chromedriver.exe'  // Adjust path for ChromeDriver
-        PYTHON_PATH = '"C:\\Program Files\\Python313\\python.exe"'
-
+        PYTHON_PATH = '"C:\\Program Files\\Python313\\python.exe"'  // Full path to Python
     }
 
     stages {
@@ -16,13 +15,22 @@ pipeline {
             }
         }
 
+        stage('Verify Python Installation') {
+            steps {
+                script {
+                    // Debug: Output the Python version to ensure it's available
+                    bat "${PYTHON_PATH} --version"
+                }
+            }
+        }
+
         stage('Set Up Virtual Environment') {
             steps {
                 script {
                     // Create virtual environment if not already created
                     bat '''
                     if not exist ${VENV_DIR}\\Scripts\\activate (
-                        python -m venv ${VENV_DIR}
+                        ${PYTHON_PATH} -m venv ${VENV_DIR}
                     )
                     '''
                 }
@@ -34,7 +42,7 @@ pipeline {
                 script {
                     // Activate the virtual environment and install dependencies
                     bat '''
-                    ${VENV_DIR}\\Scripts\\activate && pip install -r requirements.txt
+                    call ${VENV_DIR}\\Scripts\\activate.bat && pip install -r requirements.txt
                     '''
                 }
             }
@@ -45,7 +53,7 @@ pipeline {
                 script {
                     // Run Selenium tests with pytest (ensure your test script name is correct)
                     bat '''
-                    ${VENV_DIR}\\Scripts\\activate && pytest test_selenium.py --maxfail=1 --disable-warnings -q
+                    call ${VENV_DIR}\\Scripts\\activate.bat && pytest test_selenium.py --maxfail=1 --disable-warnings -q
                     '''
                 }
             }
