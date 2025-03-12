@@ -59,13 +59,6 @@ pipeline {
             }
         }
 
-        stage('Publish Test Results') {
-            steps {
-                // Publish test results (make sure pytest generates XML output)
-                junit '**/reports/test-results.xml'  // Update path as necessary
-            }
-        }
-
         stage('Deploy to Staging') {
             steps {
                 script {
