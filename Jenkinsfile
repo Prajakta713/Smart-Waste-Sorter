@@ -4,7 +4,7 @@ pipeline {
     environment {
         VENV_DIR = 'venv'  // The name of the virtual environment folder
         CHROME_DRIVER = 'C:\\Users\\Prajakta\\Downloads\\chromedriver\\chromedriver-win64\\chromedriver.exe'  // Adjust path for ChromeDriver
-        PYTHON = 'python'  // or 'python3' if python3 is the command
+        PYTHON_PATH = '"C:\\Program Files\\Python313\\python.exe"'
 
     }
 
