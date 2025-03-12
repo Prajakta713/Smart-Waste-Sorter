@@ -10,7 +10,6 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                // Checkout your Flask app repository using HTTPS with Personal Access Token
                 git credentialsId: 'github-token', url: 'https://github.com/Prajakta713/Smart-Waste-Sorter.git', branch: 'main'
             }
         }
@@ -18,7 +17,6 @@ pipeline {
         stage('Verify Python Installation') {
             steps {
                 script {
-                    // Debug: Output the Python version to ensure it's available
                     bat "%PYTHON_PATH% --version"
                 }
             }
@@ -27,7 +25,6 @@ pipeline {
         stage('Set Up Virtual Environment') {
             steps {
                 script {
-                    // Create virtual environment if not already created
                     bat '''
                     if not exist %VENV_DIR%\\Scripts\\activate (
                         %PYTHON_PATH% -m venv %VENV_DIR%
@@ -40,7 +37,6 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Activate the virtual environment and install dependencies
                     bat '''
                     call %VENV_DIR%\\Scripts\\activate.bat && pip install -r requirements.txt
                     '''
@@ -48,23 +44,32 @@ pipeline {
             }
         }
 
-        stage('Run Selenium Tests') {
+        stage('Start Flask App') {
             steps {
                 script {
-                    // Run Selenium tests with pytest (ensure your test script name is correct)
+                    // Start the Flask app in the background (adjust the command if necessary)
                     bat '''
-                    call %VENV_DIR%\\Scripts\\activate.bat && pytest test_selenium.py --maxfail=1 --disable-warnings -q
+                    start python app.py  // Adjust this to your app's startup script
                     '''
                 }
             }
         }
 
-        stage('Deploy to Staging') {
+        stage('Wait for Flask to Start') {
             steps {
                 script {
-                    // Add your deployment logic here
-                    echo 'Deploying to staging environment...'
-                    // E.g., use flask run or deploy to a staging server
+                    // Wait for Flask to start by introducing a short delay
+                    bat 'timeout /t 10'  // Wait for 10 seconds before running tests
+                }
+            }
+        }
+
+        stage('Run Selenium Tests') {
+            steps {
+                script {
+                    bat '''
+                    call %VENV_DIR%\\Scripts\\activate.bat && pytest test_selenium.py --maxfail=1 --disable-warnings -q
+                    '''
                 }
             }
         }
@@ -72,14 +77,11 @@ pipeline {
 
     post {
         always {
-            // Clean up workspace after the build
             cleanWs()
         }
-
         success {
             echo 'Build and tests passed successfully!'
         }
-
         failure {
             echo 'Build or tests failed. Please check the logs.'
         }
