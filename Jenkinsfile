@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        // Define the directory for the virtual environment
         VENV_DIR = 'venv'
+        CHROME_DRIVER = 'C:\\path\\to\\chromedriver.exe'  // Adjust path as needed
     }
 
     stages {
@@ -38,12 +38,12 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Selenium Tests') {
             steps {
                 script {
-                    // Run automated tests using pytest
+                    // Run automated Selenium tests using pytest
                     bat '''
-                    ${VENV_DIR}\\Scripts\\activate && pytest --maxfail=1 --disable-warnings -q
+                    ${VENV_DIR}\\Scripts\\activate && pytest test_selenium.py --maxfail=1 --disable-warnings -q
                     '''
                 }
             }
@@ -51,17 +51,17 @@ pipeline {
 
         stage('Publish Test Results') {
             steps {
-                // Publish test results (ensure that pytest generates a test report in XML format)
-                junit '**/test-*.xml'  // Adjust the test report path if necessary
+                // Publish test results (ensure pytest generates a test report in XML format)
+                junit '**/reports/test-results.xml'  // Update path as necessary
             }
         }
 
         stage('Deploy to Staging') {
             steps {
                 script {
-                    // Add your deployment logic here, for example:
+                    // Add your deployment logic here
                     echo 'Deploying to staging environment...'
-                    // E.g., use `flask run` or deploy to a staging server
+                    // E.g., use flask run or deploy to a staging server
                 }
             }
         }
@@ -69,7 +69,7 @@ pipeline {
 
     post {
         always {
-            // Clean up workspace after the build to avoid junk files
+            // Clean up workspace after the build
             cleanWs()
         }
 
