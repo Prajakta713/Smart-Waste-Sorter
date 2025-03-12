@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        VENV_DIR = 'venv'
-        CHROME_DRIVER = 'C:\\path\\to\\chromedriver.exe'  // Adjust path as needed
+        VENV_DIR = 'venv'  // The name of the virtual environment folder
+        CHROME_DRIVER = 'C:\\path\\to\\chromedriver.exe'  // Adjust path for ChromeDriver
     }
 
     stages {
@@ -41,7 +41,7 @@ pipeline {
         stage('Run Selenium Tests') {
             steps {
                 script {
-                    // Run automated Selenium tests using pytest
+                    // Run Selenium tests with pytest (ensure your test script name is correct)
                     bat '''
                     ${VENV_DIR}\\Scripts\\activate && pytest test_selenium.py --maxfail=1 --disable-warnings -q
                     '''
@@ -51,7 +51,7 @@ pipeline {
 
         stage('Publish Test Results') {
             steps {
-                // Publish test results (ensure pytest generates a test report in XML format)
+                // Publish test results (make sure pytest generates XML output)
                 junit '**/reports/test-results.xml'  // Update path as necessary
             }
         }
